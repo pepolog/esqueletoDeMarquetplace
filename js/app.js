@@ -230,6 +230,11 @@ function updateHeader() {
    ========================================================================== */
 
 function setupGlobalActions() {
+  // El enlace «Saltar al contenido» mueve el foco sin pasar por el enrutador.
+  document.querySelector('.skip-link')?.addEventListener('click', (event) => {
+    event.preventDefault();
+    qs('#main').focus();
+  });
   // Un enlace a la ruta actual (p. ej. «Publicar anuncio» estando ya en el asistente)
   // no dispara hashchange: lo forzamos para que la vista se reinicie.
   document.addEventListener('click', (event) => {

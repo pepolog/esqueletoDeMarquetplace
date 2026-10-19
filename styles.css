@@ -67,6 +67,8 @@ body {
   overflow-x: hidden;
 }
 body.has-modal { overflow: hidden; }
+/* Banda bajo la barra de estado en móviles con muesca (insets a 0 en el resto). */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--color-surface); }
 img { max-width: 100%; display: block; }
 h1, h2, h3, h4 { line-height: 1.25; margin: 0 0 var(--space-3); }
 h1 { font-size: 1.6rem; letter-spacing: -0.01em; }
@@ -222,7 +224,7 @@ input:disabled, select:disabled, textarea:disabled { background: var(--color-sur
 .switch input:focus-visible + .switch__track { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 
 /* 4. Cabecera y navegación ---------------------------------------------------- */
-.site-header { position: sticky; top: 0; z-index: 50; background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+.site-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50; background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
 .site-header__inner { display: flex; align-items: center; gap: var(--space-4); height: var(--header-height); }
 .site-header__menu-btn { display: none; }
 .brand { display: inline-flex; align-items: center; gap: var(--space-2); text-decoration: none; color: var(--color-text); flex-shrink: 0; }
