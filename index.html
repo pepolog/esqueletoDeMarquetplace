@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Prototipo de marketplace para comprar, vender y alquilar productos, vehículos y viviendas." />
+  <meta name="theme-color" content="#1d4ed8" />
+  <title>Trato · Compra, vende y alquila</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231d4ed8'/%3E%3Ctext x='16' y='22' font-family='system-ui,sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3ET%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido principal</a>
+
+  <!-- Aviso permanente: toda la aplicación es una demostración local -->
+  <div class="demo-banner" role="note">
+    <strong>Modo demostración.</strong>
+    Los datos se guardan solo en este navegador (LocalStorage). No hay pagos, cuentas ni mensajería reales.
+  </div>
+
+  <!-- =====================================================================
+       CABECERA PERSISTENTE
+       ===================================================================== -->
+  <header class="site-header">
+    <div class="site-header__inner container">
+      <button type="button" class="icon-btn site-header__menu-btn" id="menu-toggle" aria-label="Abrir menú principal" aria-expanded="false" aria-controls="main-nav">
+        <svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg>
+      </button>
+
+      <!-- LOGOTIPO: sustituye el contenido de .brand por el logotipo definitivo (SVG o <img>). -->
+      <a href="#/home" class="brand" aria-label="Trato, ir al inicio">
+        <span class="brand__mark" aria-hidden="true">T</span>
+        <span class="brand__name">Trato</span>
+      </a>
+
+      <!-- Buscador + selector de categorías -->
+      <form class="header-search" id="header-search" role="search" aria-label="Buscar anuncios">
+        <label for="header-search-input" class="visually-hidden">Buscar</label>
+        <svg class="icon header-search__icon" aria-hidden="true"><use href="#i-search"></use></svg>
+        <input id="header-search-input" name="q" type="search" placeholder="Buscar coches, pisos, móviles…" autocomplete="off" />
+        <label for="header-category" class="visually-hidden">Categoría</label>
+        <select id="header-category" name="category" class="header-search__category">
+          <option value="">Todas las categorías</option>
+        </select>
+        <button type="submit" class="btn btn--primary header-search__submit">Buscar</button>
+      </form>
+
+      <nav class="header-actions" aria-label="Accesos de usuario">
+        <a href="#/favorites" class="icon-btn header-actions__link" aria-label="Favoritos">
+          <svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg>
+          <span class="header-actions__text">Favoritos</span>
+          <span class="count-dot" data-count="favorites" hidden></span>
+        </a>
+        <a href="#/purchases" class="icon-btn header-actions__link" aria-label="Mis compras y pedidos">
+          <svg class="icon" aria-hidden="true"><use href="#i-bag"></use></svg>
+          <span class="header-actions__text">Compras</span>
+          <span class="count-dot" data-count="orders" hidden></span>
+        </a>
+        <a href="#/buyer/messages" class="icon-btn header-actions__link" aria-label="Mensajes">
+          <svg class="icon" aria-hidden="true"><use href="#i-message"></use></svg>
+          <span class="header-actions__text">Mensajes</span>
+          <span class="count-dot" data-count="messages" hidden></span>
+        </a>
+        <a href="#/sell" class="btn btn--accent header-actions__publish">
+          <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+          <span>Publicar anuncio</span>
+        </a>
+
+        <!-- Perfil + menú desplegable -->
+        <div class="user-menu" id="user-menu">
+          <button type="button" class="user-menu__trigger" id="user-menu-trigger" aria-haspopup="true" aria-expanded="false" aria-controls="user-menu-panel">
+            <span id="user-menu-avatar"></span>
+            <svg class="icon icon--xs" aria-hidden="true"><use href="#i-chevronDown"></use></svg>
+            <span class="visually-hidden">Menú de usuario</span>
+          </button>
+          <div class="user-menu__panel" id="user-menu-panel" hidden></div>
+        </div>
+      </nav>
+    </div>
+
+    <!-- MENÚ PRINCIPAL (barra en escritorio, panel desplegable en móvil) -->
+    <nav class="main-nav" id="main-nav" aria-label="Menú principal">
+      <ul class="main-nav__list container">
+        <li><a href="#/home" data-nav="home"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>Inicio</a></li>
+        <li><a href="#/explore" data-nav="explore"><svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg>Explorar anuncios</a></li>
+        <li><a href="#/categories" data-nav="categories"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Categorías</a></li>
+        <li><a href="#/vehicles" data-nav="vehicles"><svg class="icon" aria-hidden="true"><use href="#i-car"></use></svg>Vehículos</a></li>
+        <li><a href="#/housing" data-nav="housing"><svg class="icon" aria-hidden="true"><use href="#i-building"></use></svg>Viviendas</a></li>
+        <li><a href="#/rentals" data-nav="rentals"><svg class="icon" aria-hidden="true"><use href="#i-key"></use></svg>Alquileres</a></li>
+        <li><a href="#/favorites" data-nav="favorites"><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg>Favoritos</a></li>
+        <li><a href="#/purchases" data-nav="purchases"><svg class="icon" aria-hidden="true"><use href="#i-bag"></use></svg>Mis compras</a></li>
+        <li><a href="#/seller/overview" data-nav="sell"><svg class="icon" aria-hidden="true"><use href="#i-store"></use></svg>Vender</a></li>
+        <li><a href="#/profile" data-nav="profile"><svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>Mi perfil</a></li>
+        <li><a href="#/settings/personal" data-nav="settings"><svg class="icon" aria-hidden="true"><use href="#i-sliders"></use></svg>Ajustes</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div class="nav-overlay" id="nav-overlay" hidden></div>
+
+  <!-- =====================================================================
+       CONTENIDO: cada sección se dibuja aquí desde JavaScript (app.js)
+       ===================================================================== -->
+  <main id="main" class="main" tabindex="-1">
+    <div id="view" class="view">
+      <div class="loading-block" role="status">
+        <span class="spinner spinner--lg" aria-hidden="true"></span>
+        <span>Cargando la marketplace…</span>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p>© <span id="footer-year"></span> Trato · Prototipo de marketplace. Datos ficticios con fines de demostración.</p>
+      <nav aria-label="Enlaces legales">
+        <a href="#/settings/help">Ayuda</a>
+        <a href="#/settings/help?open=terms">Condiciones de uso</a>
+        <a href="#/settings/help?open=privacy">Privacidad</a>
+        <a href="#/settings/help?open=rules">Normas de publicación</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Navegación inferior (solo móvil) -->
+  <nav class="bottom-nav" aria-label="Navegación rápida">
+    <a href="#/home" data-nav="home"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg><span>Inicio</span></a>
+    <a href="#/explore" data-nav="explore"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg><span>Buscar</span></a>
+    <a href="#/sell" data-nav="sell" class="bottom-nav__publish"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg><span>Publicar</span></a>
+    <a href="#/favorites" data-nav="favorites"><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg><span>Favoritos</span></a>
+    <a href="#/buyer/overview" data-nav="account"><svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg><span>Cuenta</span></a>
+  </nav>
+
+  <!-- Región de avisos accesible -->
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
+
+  <!-- Aviso si el archivo se abre con doble clic (file://): los módulos ES necesitan un servidor local -->
+  <script>
+    if (location.protocol === 'file:') {
+      document.getElementById('view').innerHTML =
+        '<div class="notice notice--warning" style="margin:2rem auto;max-width:640px">' +
+        '<div><strong>Este proyecto usa módulos JavaScript y debe abrirse mediante un servidor local.</strong>' +
+        '<p>En la carpeta del proyecto ejecuta <code>python3 -m http.server 8080</code> ' +
+        'y abre <code>http://localhost:8080</code>. Consulta el README para más opciones.</p></div></div>';
+    }
+  </script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
