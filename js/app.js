@@ -19,7 +19,7 @@ import {
   avatar, backendBadge, badge, conditionLabel, confirmDialog, emptyState, formatAttribute, handleError, listingGrid,
   listingStatusBadge, navigate, notice, openReportDialog, priceLabel, qs, qsa, renderField, stars, toast, withBusy,
 } from './ui.js';
-import { debounce, escapeHtml, formatDate, formatMoney, timeAgo } from './utils.js';
+import { debounce, escapeHtml, formatDate, formatMoney, replaceHash, safeStorage, timeAgo } from './utils.js';
 import { isFieldVisible } from './validation.js';
 import { renderSellerPanel } from './seller.js';
 import { openPurchaseDialog, renderBuyerPanel } from './buyer.js';
@@ -431,7 +431,7 @@ function renderExplore(container, params, preset) {
     const values = readFilters();
     const search = new URLSearchParams();
     Object.entries(values).forEach(([key, value]) => { if (value && !(key === 'sort' && value === 'recent')) search.set(key, value); });
-    history.replaceState(null, '', `${routeBase}${search.toString() ? `?${search}` : ''}`);
+    replaceHash(`${routeBase}${search.toString() ? `?${search}` : ''}`);
   };
   const onChange = () => { paintResults(); syncUrl(); };
   const onChangeDebounced = debounce(onChange, 220);
@@ -499,10 +499,10 @@ function renderCategories(container) {
 function registerViewOnce(listing) {
   if (listing.sellerId === select.currentUserId() || listing.status !== 'active') return;
   let viewed = [];
-  try { viewed = JSON.parse(sessionStorage.getItem('trato.viewed') ?? '[]'); } catch { viewed = []; }
+  try { viewed = JSON.parse(safeStorage.get('sessionStorage', 'trato.viewed') ?? '[]'); } catch { viewed = []; }
   const key = `${select.currentUserId()}:${listing.id}`;
   if (viewed.includes(key)) return;
-  sessionStorage.setItem('trato.viewed', JSON.stringify([...viewed, key]));
+  safeStorage.set('sessionStorage', 'trato.viewed', JSON.stringify([...viewed, key]));
   actions.registerView(listing.id).catch(() => {});
 }
 
@@ -745,8 +745,11 @@ async function bootstrap() {
   });
   updateHeader();
   window.addEventListener('hashchange', route);
-  if (!location.hash) history.replaceState(null, '', '#/home');
+  if (!location.hash) replaceHash('#/home');
   route();
+  if (!select.isPersistent()) {
+    toast('Este navegador no permite guardar datos: los cambios se perderán al recargar la página.', { tone: 'warning', timeout: 9000 });
+  }
 }
 
 if (location.protocol !== 'file:') bootstrap();

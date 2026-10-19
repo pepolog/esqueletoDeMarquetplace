@@ -67,6 +67,28 @@ export function createId(prefix) {
   return `${prefix}_${random}`;
 }
 
+/**
+ * Acceso al almacenamiento del navegador que nunca lanza excepciones.
+ * En modo privado, con los datos del sitio bloqueados o dentro de algunos
+ * marcos incrustados, localStorage/sessionStorage pueden no estar disponibles.
+ */
+export const safeStorage = {
+  get(area, key) {
+    try { return globalThis[area]?.getItem(key) ?? null; } catch { return null; }
+  },
+  set(area, key, value) {
+    try { globalThis[area].setItem(key, value); return true; } catch { return false; }
+  },
+  remove(area, key) {
+    try { globalThis[area].removeItem(key); } catch { /* sin almacenamiento: nada que borrar */ }
+  },
+};
+
+/** Sustituye el hash de la URL sin añadir historial ni disparar el enrutador. */
+export function replaceHash(hash) {
+  try { history.replaceState(null, '', hash); } catch { /* entornos que no permiten la History API */ }
+}
+
 /** Copia profunda de datos serializables (los datos de la app siempre lo son). */
 export function deepClone(value) {
   return value === undefined ? undefined : JSON.parse(JSON.stringify(value));

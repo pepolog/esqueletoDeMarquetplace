@@ -158,7 +158,7 @@ Incluye 27 anuncios variados (todos distintos, con ilustraciones SVG generadas l
 - Datos personales con validación; los datos sensibles se muestran enmascarados y nunca en el perfil público.
 - Foto de perfil: subida, vista previa, cambio, eliminación y avatar predeterminado con iniciales; validación de tipo y tamaño.
 - Perfil público configurable; visibilidad del perfil y permisos de comunicación (operativos en local).
-- Preferencias de notificaciones; descarga de los datos propios en JSON.
+- Preferencias de notificaciones; exportación de los datos propios en JSON (descarga + copia en pantalla).
 - Ayuda: centro de ayuda, preguntas frecuentes, normas de publicación, condiciones de uso, política de privacidad, contacto con soporte y comunicación de problemas (registrados en local).
 
 **Accesibilidad**
@@ -182,7 +182,7 @@ Están señaladas en la interfaz con la etiqueta **«Requiere backend»** o con 
 | Almacenamiento definitivo de imágenes | Las fotos se reducen y se guardan como data URL en LocalStorage |
 | Envío de notificaciones (correo/push) | Solo se guardan las preferencias |
 | Moderación de anuncios y denuncias | Los anuncios se aprueban al instante; las denuncias se registran en local |
-| Exportación oficial de datos (RGPD) | Se descarga una copia local en JSON |
+| Exportación oficial de datos (RGPD) | Se exporta una copia local en JSON |
 | Contador de visitas fiable | Se cuenta una visita por anuncio y sesión del navegador |
 
 Todas las validaciones del navegador (propietario, transiciones, solapes…) **deben repetirse en el servidor**: ocultar botones o campos en el cliente no aporta seguridad.

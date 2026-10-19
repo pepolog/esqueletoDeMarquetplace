@@ -19,7 +19,7 @@
 
 import { APP_CONFIG, buildSeedData, getCategory, OPEN_ORDER_STATUSES, ORDER_TRANSITIONS } from './data.js';
 import { validateListing } from './validation.js';
-import { createId, deepClone } from './utils.js';
+import { createId, deepClone, safeStorage } from './utils.js';
 
 /** Error de negocio con mensaje apto para mostrar al usuario. */
 export class ApiError extends Error {
@@ -96,14 +96,22 @@ export function openSaleOrder(orders, listingId) {
 class LocalApi {
   constructor() {
     this.db = null;
+    /** false si el navegador no deja guardar datos: la demo funciona solo en memoria. */
+    this.persistent = true;
+    /** Usuario de demostración activo cuando no hay almacenamiento disponible. */
+    this.memorySessionUserId = null;
   }
 
   /* ---------------------------- Persistencia ---------------------------- */
 
   /** Carga los datos de LocalStorage o crea los datos de prueba la primera vez. */
   async init() {
+    const probeKey = `${APP_CONFIG.storageKey}.probe`;
+    this.persistent = safeStorage.set('localStorage', probeKey, '1');
+    safeStorage.remove('localStorage', probeKey);
+    if (!this.persistent) console.warn('LocalStorage no disponible: los datos se mantendrán solo en memoria.');
     try {
-      const raw = localStorage.getItem(APP_CONFIG.storageKey);
+      const raw = safeStorage.get('localStorage', APP_CONFIG.storageKey);
       this.db = raw ? JSON.parse(raw) : null;
     } catch (error) {
       console.warn('No se pudieron leer los datos locales; se regeneran los datos de prueba.', error);
@@ -118,6 +126,7 @@ class LocalApi {
 
   /** Guarda el estado completo. Lanza un ApiError comprensible si se agota el espacio. */
   #persist() {
+    if (!this.persistent) return;
     try {
       localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(this.db));
     } catch (error) {
@@ -156,7 +165,7 @@ class LocalApi {
     await wait(APP_CONFIG.demoLatencyMs);
     this.db = buildSeedData();
     this.#persist();
-    sessionStorage.removeItem('trato.viewed');
+    safeStorage.remove('sessionStorage', 'trato.viewed');
     return true;
   }
 
@@ -165,13 +174,14 @@ class LocalApi {
   // identificador guardado en LocalStorage que se puede cambiar libremente.
 
   async getCurrentUserId() {
-    const stored = localStorage.getItem(APP_CONFIG.sessionKey);
+    const stored = safeStorage.get('localStorage', APP_CONFIG.sessionKey) ?? this.memorySessionUserId;
     return this.db.users.some((user) => user.id === stored) ? stored : 'u1';
   }
 
   async switchDemoUser(userId) {
     if (!this.db.users.some((user) => user.id === userId)) throw new ApiError('Usuario de demostración no encontrado.');
-    localStorage.setItem(APP_CONFIG.sessionKey, userId);
+    this.memorySessionUserId = userId;
+    safeStorage.set('localStorage', APP_CONFIG.sessionKey, userId);
     return userId;
   }
 

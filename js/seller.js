@@ -17,7 +17,7 @@ import {
   avatar, backendBadge, badge, confirmDialog, emptyState, filterTabs, handleError, listingMini, listingStatusBadge, notice, openModal,
   orderStatusBadge, panelSidebar, priceLabel, qs, qsa, renderField, sectionHeader, showFormErrors, stars, statCard, toast, withBusy,
 } from './ui.js';
-import { escapeHtml, formatDate, formatMoney, timeAgo } from './utils.js';
+import { escapeHtml, formatDate, formatMoney, replaceHash, timeAgo } from './utils.js';
 import { renderListingWizard } from './wizard.js';
 
 const SECTIONS = {
@@ -114,7 +114,7 @@ function renderMyListings(container, params) {
 
     qsa('[data-filter]', container).forEach((button) => button.addEventListener('click', () => {
       filter = button.dataset.filter;
-      history.replaceState(null, '', `#/seller/listings${filter === 'all' ? '' : `?status=${filter}`}`);
+      replaceHash(`#/seller/listings${filter === 'all' ? '' : `?status=${filter}`}`);
       paint();
       qs(`[data-filter="${filter}"]`, container)?.focus();
     }));

@@ -30,7 +30,7 @@ import { actions, select } from './store.js';
 import {
   badge, conditionLabel, emptyState, formatAttribute, handleError, listingStatusBadge, notice, qs, qsa, renderField, sectionHeader, toast, withBusy,
 } from './ui.js';
-import { deepClone, escapeHtml, formatMoney, getPath, setPath } from './utils.js';
+import { deepClone, escapeHtml, formatMoney, getPath, replaceHash, setPath } from './utils.js';
 import { firstStepWithErrors, validateListing, validateListingStep, visibleCategoryFields, WIZARD_STEPS } from './validation.js';
 
 /** Estado del asistente (persistente mientras la pestaña siga abierta). */
@@ -653,7 +653,7 @@ async function saveDraft(container, button) {
       wizardState.originalStatus = 'draft';
       wizardState.errors = {};
       toast('Borrador guardado. Lo encontrarás en «Mis anuncios».');
-      history.replaceState(null, '', `#/seller/edit/${listing.id}`);
+      replaceHash(`#/seller/edit/${listing.id}`);
     } catch (error) { showApiValidationErrors(container, error); }
   });
 }
@@ -699,7 +699,7 @@ function paintSuccess(container) {
     </div>`;
   qs('[data-new-listing]', container).addEventListener('click', () => {
     wizardState = createState({ mode: 'create' });
-    if (location.hash !== '#/seller/new') history.replaceState(null, '', '#/seller/new');
+    if (location.hash !== '#/seller/new') replaceHash('#/seller/new');
     paintWizard(container);
   });
 }

@@ -15,7 +15,7 @@ import {
   avatar, emptyState, filterTabs, handleError, listingCard, listingMini, navigate, notice, openModal, panelSidebar, priceLabel,
   qs, qsa, sectionHeader, showFormErrors, statCard, toast, withBusy,
 } from './ui.js';
-import { escapeHtml, formatDate, formatMoney, timeAgo, toIsoDate, todayIsoDate } from './utils.js';
+import { escapeHtml, formatDate, formatMoney, replaceHash, timeAgo, toIsoDate, todayIsoDate } from './utils.js';
 
 /* ==========================================================================
    Estructura del panel
@@ -261,7 +261,7 @@ function renderMessages(container, params) {
 
     qsa('[data-conversation]', container).forEach((button) => button.addEventListener('click', () => {
       selectedId = button.dataset.conversation;
-      history.replaceState(null, '', `#/buyer/messages?c=${encodeURIComponent(selectedId)}`);
+      replaceHash(`#/buyer/messages?c=${encodeURIComponent(selectedId)}`);
       paint();
       qs('#message-input', container)?.focus();
     }));

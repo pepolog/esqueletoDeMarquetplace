@@ -46,6 +46,8 @@ export async function initStore() {
 
 export const select = {
   currentUserId: () => state.currentUserId,
+  /** false si el navegador no permite guardar datos (los cambios se pierden al recargar). */
+  isPersistent: () => api.persistent,
   currentUser: () => state.db.users.find((user) => user.id === state.currentUserId) ?? null,
   users: () => state.db.users,
   user: (userId) => state.db.users.find((user) => user.id === userId) ?? null,

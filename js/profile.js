@@ -14,7 +14,7 @@ import { icon } from './icons.js';
 import { processImageFile, validateImageFile } from './media.js';
 import { actions, select } from './store.js';
 import {
-  avatar, backendBadge, confirmDialog, handleError, notice, openReportDialog, panelSidebar, qs, renderField, sectionHeader,
+  avatar, backendBadge, confirmDialog, handleError, notice, openModal, openReportDialog, panelSidebar, qs, renderField, sectionHeader,
   showFormErrors, stars, toast, withBusy,
 } from './ui.js';
 import { escapeHtml, formatDate, maskEmail, maskPhone, timeAgo } from './utils.js';
@@ -229,8 +229,13 @@ function renderPublicSettings(container) {
    Seguridad y privacidad
    ========================================================================== */
 
-/** Descarga un JSON con los datos del usuario guardados en este navegador. */
-function downloadMyData() {
+/**
+ * Exporta en JSON los datos del usuario guardados en este navegador.
+ * Intenta descargar el archivo y, además, muestra el contenido en una
+ * ventana con botón de copiar: algunos navegadores o visores incrustados
+ * bloquean las descargas iniciadas por script.
+ */
+function exportMyData() {
   const user = select.currentUser();
   const data = {
     exportedAt: new Date().toISOString(),
@@ -244,15 +249,38 @@ function downloadMyData() {
     reviewsReceived: select.reviewsFor(user.id),
     reports: select.reportsBy(user.id),
   };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `mis-datos-${user.username}.json`;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  const json = JSON.stringify(data, null, 2);
+  try {
+    const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `mis-datos-${user.username}.json`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch { /* la copia en pantalla sigue disponible */ }
+
+  const { element } = openModal({
+    title: 'Mis datos',
+    size: 'lg',
+    body: `
+      <p class="muted small">Si la descarga no se ha iniciado, copia el contenido y guárdalo como <code>mis-datos-${escapeHtml(user.username)}.json</code>.</p>
+      <label class="visually-hidden" for="export-json">Datos en formato JSON</label>
+      <textarea id="export-json" class="code-area" rows="14" readonly>${escapeHtml(json)}</textarea>`,
+    footer: '<button type="button" class="btn btn--ghost" data-modal-close>Cerrar</button><button type="button" class="btn btn--primary" data-copy>Copiar</button>',
+  });
+  const textarea = qs('#export-json', element);
+  qs('[data-copy]', element).addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(json);
+      toast('Datos copiados al portapapeles.');
+    } catch {
+      textarea.focus();
+      textarea.select();
+      toast('Selecciona el texto y cópialo con Ctrl+C (Cmd+C en Mac).', { tone: 'info' });
+    }
+  });
 }
 
 function renderSecurity(container) {
@@ -294,8 +322,8 @@ function renderSecurity(container) {
 
     <section class="card panel-card">
       <h2>${icon('download')} Tus datos</h2>
-      <p>Descarga una copia en formato JSON de tus datos guardados en este navegador: perfil, anuncios, pedidos, favoritos, mensajes y valoraciones.</p>
-      <div class="form-actions"><button type="button" class="btn btn--ghost" data-download>${icon('download')}Descargar mis datos</button></div>
+      <p>Obtén una copia en formato JSON de tus datos guardados en este navegador: perfil, anuncios, pedidos, favoritos, mensajes y valoraciones.</p>
+      <div class="form-actions"><button type="button" class="btn btn--ghost" data-download>${icon('download')}Exportar mis datos</button></div>
       <p class="muted small">Una solicitud formal de acceso a datos (RGPD) se gestionaría desde el backend.</p>
     </section>
 
@@ -313,10 +341,7 @@ function renderSecurity(container) {
       preferences: { ...user.preferences, privacy: { ...user.preferences.privacy, profileVisibility: form.elements.profileVisibility.value, allowMessagesFrom: form.elements.allowMessagesFrom.value } },
     }, 'Preferencias de privacidad guardadas.');
   });
-  qs('[data-download]', container).addEventListener('click', () => {
-    downloadMyData();
-    toast('Descarga iniciada.', { tone: 'info' });
-  });
+  qs('[data-download]', container).addEventListener('click', exportMyData);
 }
 
 /* ==========================================================================
