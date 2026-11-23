@@ -26,6 +26,7 @@ const SECTIONS = {
   security: { label: 'Seguridad y privacidad', icon: 'shield', render: renderSecurity },
   notifications: { label: 'Notificaciones', icon: 'bell', render: renderNotifications },
   help: { label: 'Ayuda y soporte', icon: 'help', render: renderHelp },
+  sesion: {label: 'opsiones de sesion' ,  icon:"", render: rendersesion },
 };
 
 export function renderSettings(container, section, params) {
@@ -384,6 +385,10 @@ function renderNotifications(container) {
     notifications.channel = form.elements.channel.value;
     await saveProfile(qs('button[type="submit"]', form), { preferences: { ...user.preferences, notifications } }, 'Preferencias de notificación guardadas.');
   });
+}
+
+function rendersesion(container){
+  
 }
 
 /* ==========================================================================
