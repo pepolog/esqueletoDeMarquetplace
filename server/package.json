@@ -1,4 +1,9 @@
 {
+    "type": "module",
+    "scripts": {
+        "dev": "node --watch src/server.js",
+        "start": "node src/server.js"
+    },
     "dependencies": {
         "@prisma/client": "^6.19.3",
         "bcryptjs": "^3.0.3",

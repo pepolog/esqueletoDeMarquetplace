@@ -56,17 +56,15 @@ router.post("/login", async(req, res) => {
 });
 
 router.get("/me", authMiddleware, async(req, res) => {
-            try {
-                const router.get("/me", authMiddleware, async(req, res) => {
-                    try {
-                        const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-                        if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+    try {
+        const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+        if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
-                        res.json({ id: user.id, email: user.email, name: user.name });
-                    } catch (error) {
-                        console.error(error);
-                        res.status(500).json({ error: "Error del servidor" });
-                    }
-                });
+        res.json({ id: user.id, email: user.email, name: user.name });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error del servidor" });
+    }
+});
 
-                export default router;
+export default router;
